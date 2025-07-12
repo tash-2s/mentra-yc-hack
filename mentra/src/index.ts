@@ -12,46 +12,20 @@ class MyApp extends AppServer {
 
     session.events.onButtonPress(async (button) => {
       this.logger.info(`Button pressed: ${button.buttonId}, type: ${button.pressType}`);
-      this.logger.info(`isStreaming: ${session.camera.isCurrentlyStreaming()}`);
 
       if (session.camera.isCurrentlyStreaming()) {
+        await session.camera.stopStream();
+      } else {
         await session.camera.startStream({
           rtmpUrl: RTMP_URL,
         });
-      } else {
-        await session.camera.stopStream();
       }
     });
 
     // Subscribe to RTMP stream status updates
+    session.subscribe(StreamType.RTMP_STREAM_STATUS);
     const statusUnsubscribe = session.camera.onStreamStatus((status) => {
-      console.log(`Stream status: ${status.status}`);
-
-      if (status.status === 'active') {
-        console.log('🟢 RTMP stream is live!');
-        session.layouts.showTextWall('🟢 Stream is live!');
-
-        if (status.stats) {
-          console.log(`Stats:
-            Bitrate: ${status.stats.bitrate} bps
-            FPS: ${status.stats.fps}
-            Duration: ${status.stats.duration}s
-            Dropped Frames: ${status.stats.droppedFrames}
-          `);
-        }
-      } else if (status.status === 'error') {
-        console.error(`❌ Stream error: ${status.errorDetails}`);
-        session.layouts.showTextWall(`❌ Stream Error\n\n${status.errorDetails || 'Unknown error'}`);
-      } else if (status.status === 'initializing') {
-        console.log('📡 Initializing RTMP connection...');
-        session.layouts.showTextWall('📡 Connecting to RTMP server...');
-      } else if (status.status === 'connecting') {
-        console.log('🔗 Connecting to RTMP server...');
-        session.layouts.showTextWall('🔗 Establishing connection...');
-      } else if (status.status === 'stopped') {
-        console.log('🔴 Stream stopped');
-        session.layouts.showTextWall('🔴 Stream stopped');
-      }
+      console.log(`Stream status: ${JSON.stringify(status)}`);
     });
 
     const healthCheckInterval = setInterval(() => {
