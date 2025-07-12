@@ -1,4 +1,4 @@
-# mentra
+# Mentra Demo App
 
 To install dependencies:
 
