@@ -4,7 +4,7 @@ const PACKAGE_NAME = process.env.PACKAGE_NAME ?? (() => { throw new Error('PACKA
 const MENTRAOS_API_KEY = process.env.MENTRAOS_API_KEY ?? (() => { throw new Error('MENTRAOS_API_KEY is not set in .env file'); })();
 const PORT = parseInt(process.env.PORT || '3000');
 
-const RTMP_URL = 'rtmp://localhost:1945/live/test'; // FIXME
+const RTMP_URL = 'rtmp://4.tcp.us-cal-1.ngrok.io:11976/live/test'; // FIXME
 
 class MyApp extends AppServer {
   protected async onSession(session: AppSession, userId: string): Promise<void> {
