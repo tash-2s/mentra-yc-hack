@@ -7,7 +7,7 @@ import zipfile
 
 def download_vosk_model():
     """Download and extract Vosk English model"""
-    model_name = "vosk-model-en-us-0.22"
+    model_name = "vosk-model-small-en-us-0.15"
     model_url = f"https://alphacephei.com/vosk/models/{model_name}.zip"
 
     print(f"Downloading Vosk model: {model_name}")
@@ -39,8 +39,6 @@ def download_vosk_model():
 
         print(f"\n✓ Model ready at: ./{model_name}")
         print(f"Model size: {sum(f.stat().st_size for f in Path(model_name).rglob('*') if f.is_file()) / 1024 / 1024:.1f} MB")
-
-        print(f"Please run: \ncd vosk-model-en-us-0.22\nrm -rf rnnlm rescore")
 
         return True
 
