@@ -1,0 +1,32 @@
+[project]
+name = "py"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aiofiles>=24.1.0",
+    "aiohttp>=3.12.13",
+    "aiortc>=1.13.0",
+    "av>=14.4.0",
+    "face-recognition>=1.3.0",
+    "numpy>=2.2.6",
+    "openai[aiohttp]>=1.95.0",
+    "opencv-python>=4.12.0.88",
+    "pyrtmp>=0.3.1",
+    "requests>=2.32.4",
+    "setuptools>=80.9.0",
+    "vosk",
+    "watchdog>=6.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.29.5",
+]
+
+[tool.basedpyright]
+typeCheckingMode = "basic"
+
+[tool.uv.sources]
+vosk = { url = "https://github.com/alphacep/vosk-api/releases/download/v0.3.42/vosk-0.3.42-py3-none-macosx_10_6_universal2.whl" }

@@ -1,0 +1,10 @@
+/*.mp4
+/*.flv
+/*.MOV
+/__pycache__/
+/allowlist/
+/allowlist_raw/
+/captures/
+/consented_captures/
+/transcripts/
+/vosk-model-*/

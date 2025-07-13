@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #111;
+            font-family: sans-serif;
+            color: #eee;
+        }
+        video {
+            max-width: 90%;
+            max-height: 80vh;
+            background: #000;
+            border: 2px solid #333;
+        }
+        .status {
+            margin: 20px;
+            padding: 10px 20px;
+            background: #222;
+            border-radius: 5px;
+            min-width: 300px;
+            text-align: center;
+        }
+        .error {
+            color: #f44;
+        }
+        .waiting {
+            color: #fa0;
+        }
+        .connected {
+            color: #4f4;
+        }
+    </style>
+</head>
+<body>
+    <video id="video" autoplay style="display: none;"></video>
+    <div id="status" class="status waiting">Waiting for RTMP stream...</div>
+
+    <script>
+    let retryCount = 0;
+    let pc = null;
+
+    function status(text, className) {
+        document.getElementById('status').textContent = text;
+        document.getElementById('status').className = 'status ' + className;
+    }
+
+    async function connect() {
+        try {
+            if (pc) {
+                pc.close();
+            }
+
+            pc = new RTCPeerConnection();
+
+            pc.ontrack = (event) => {
+                console.log('Got track:', event.track.kind);
+                const video = document.getElementById('video');
+                video.srcObject = event.streams[0];
+                video.style.display = 'block';
+                status('Connected', 'connected');
+                retryCount = 0;
+
+                // Track ends when RTCP BYE arrives
+                event.track.onended = () => {
+                    console.warn('Track ended - restarting');
+                    status('Waiting for RTMP stream...', 'waiting');
+                    video.style.display = 'none';
+                    tryConnect(); // Immediately create a fresh offer
+                };
+            };
+
+            pc.onconnectionstatechange = () => {
+                console.log('Connection state:', pc.connectionState);
+                if (['failed', 'disconnected', 'closed'].includes(pc.connectionState)) {
+                    status('Waiting for RTMP stream...', 'waiting');
+                    setTimeout(tryConnect, 1000);
+                }
+            };
+
+            pc.addTransceiver('video', { direction: 'recvonly' });
+            pc.addTransceiver('audio', { direction: 'recvonly' });
+
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+
+            // Wait for ICE gathering
+            await new Promise(resolve => {
+                if (pc.iceGatheringState === 'complete') {
+                    resolve();
+                } else {
+                    pc.onicegatheringstatechange = () => {
+                        if (pc.iceGatheringState === 'complete') resolve();
+                    };
+                }
+            });
+
+            // Send offer
+            const response = await fetch('/offer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(pc.localDescription)
+            });
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    // No stream yet, retry
+                    status(`Waiting for RTMP stream... (retry ${++retryCount})`, 'waiting');
+                    setTimeout(tryConnect, 2000);
+                    return;
+                }
+                throw new Error('Server error: ' + response.status);
+            }
+
+            const answer = await response.json();
+            await pc.setRemoteDescription(answer);
+
+        } catch (err) {
+            console.error('Connection error:', err);
+            status('Error: ' + err.message, 'error');
+            setTimeout(tryConnect, 3000);
+        }
+    }
+
+    function tryConnect() {
+        connect().catch(console.error);
+    }
+
+    // Start connection attempts
+    tryConnect();
+
+    </script>
+</body>
+</html>
