@@ -7,7 +7,7 @@ import zipfile
 
 def download_vosk_model():
     """Download and extract Vosk English model"""
-    model_name = "vosk-model-small-en-us-0.15"
+    model_name = "vosk-model-en-us-0.22-lgraph"
     model_url = f"https://alphacephei.com/vosk/models/{model_name}.zip"
 
     print(f"Downloading Vosk model: {model_name}")

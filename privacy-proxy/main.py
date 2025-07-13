@@ -923,7 +923,7 @@ async def main():
                         help="JPEG quality for captures (1-100)")
     parser.add_argument("--transcript", action="store_true",
                         help="Enable speech-to-text transcription")
-    parser.add_argument("--transcript-model", default="./vosk-model-small-en-us-0.15",
+    parser.add_argument("--transcript-model", default="./vosk-model-en-us-0.22-lgraph",
                         help="Path to Vosk model directory")
     parser.add_argument("--width", type=int, default=1280,
                         help="Video width (default: 1280)")
