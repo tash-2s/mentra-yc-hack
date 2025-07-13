@@ -10,4 +10,5 @@ To run:
 
 ```bash
 bun run src/index.ts
+# cloudflared tunnel --url http://localhost:3000
 ```

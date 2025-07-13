@@ -16,7 +16,7 @@
         }
         video {
             max-width: 90%;
-            max-height: 80vh;
+            max-height: 90vh;
             background: #000;
             border: 2px solid #333;
         }
@@ -65,7 +65,7 @@
                 const video = document.getElementById('video');
                 video.srcObject = event.streams[0];
                 video.style.display = 'block';
-                status('Connected', 'connected');
+                status('Connected: Live!', 'connected');
                 retryCount = 0;
 
                 // Track ends when RTCP BYE arrives
